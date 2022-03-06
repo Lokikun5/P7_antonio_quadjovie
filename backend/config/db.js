@@ -1,6 +1,6 @@
 // get the client
 const mysql = require('mysql2');
-const dotenv = require("dotenv").config();
+require('dotenv').config();
 
 // Create the connection pool. The pool-specific settings are the defaults
 const pool = mysql.createPool({
@@ -11,4 +11,4 @@ const pool = mysql.createPool({
 });
 
  
-module.exports = pool.promise( console.log("Connexion DB"));
+module.exports = pool.promise( console.log("Connexion DB moi"));
