@@ -106,7 +106,7 @@
           <p>Email ou mot de passe incorrect</p>
         </div>
         <div id="formFooter">
-          <p class="underlineHover" href="#">Bienvenue !</p>
+          <p>Bienvenue !</p>
         </div>
       </div>
     </div>
@@ -165,12 +165,11 @@ h2 {
   border-radius: 10px 10px 10px 10px;
   background: #fff;
   padding: 30px;
-  width: 90%;
+  width: 100%;
   max-width: 450px;
+  height: 500px;
   position: relative;
   padding: 0px;
-  -webkit-box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.3);
-  box-shadow: 0 30px 60px 0 rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
@@ -390,7 +389,9 @@ input[type="text"]:placeholder {
 
 <script>
 import axios from "axios";
-const CryptoJS = require("crypto-js");
+import AuthService from "../services/auth_service";
+import AuthService_login from "../services/anth_service_login";
+//const CryptoJS = require("crypto-js");
 
 export default {
   data() {
@@ -446,43 +447,24 @@ export default {
       );
     },
     signup() {
+      const auth_service = new AuthService();
       this.nom = document.querySelector("#nom").value;
       this.prenom = document.querySelector("#prenom").value;
       this.password = document.querySelector("#password").value;
       this.email = document.querySelector("#email").value;
       if (this.validation()) {
         const self = this;
-        axios
-          .post("http://localhost:3000/api/user/signup", {
+        
+          axios.post("http://localhost:3000/api/user/signup", {
             nom: this.nom,
             prenom: this.prenom,
             email: this.email,
             password: this.password,
           })
           .then(function (response) {
-            console.log(response);
-            axios
-              .post("http://localhost:3000/api/user/login", {
-                email: self.email,
-                password: self.password,
-              })
-              .then(function (response) {
-                const token = response.data.token;
-                const num = response.data.userId;
-                const userId = CryptoJS.AES.encrypt(
-                  num.toString(),
-                  self.$store.state.CryptoKey
-                ).toString();
-                document.cookie = `user-token=${token}; SameSite=Lax; Secure; max-age=86400;`;
-                document.cookie = `userId=${userId}; SameSite=Lax; Secure; max-age=86400;`;
-                self.$router.push("/home");
-                self.$router.go();
-              })
-              .catch(function (error) {
-                if (error) {
-                  self.incorrect = true;
-                }
-              });
+           const signup = await auth_service.signup(self.nom, self.prenom, self.email, self.password);
+            console.log(response); 
+            this.$router.push('/Home');  
           })
           .catch(function (error) {
             console.log(error);
@@ -491,6 +473,7 @@ export default {
       }
     },
     login() {
+      const anth_service_login = new AuthService_login();
       this.password = document.querySelector("#passwordCheck").value;
       this.email = document.querySelector("#emailCheck").value;
       const self = this;
@@ -500,17 +483,10 @@ export default {
           password: this.password,
         })
         .then(function (response) {
-          const token = response.data.token;
-          const num = response.data.userId;
-          const userId = CryptoJS.AES.encrypt(
-            num.toString(),
-            self.$store.state.CryptoKey
-          ).toString();
-          document.cookie = `user-token=${token}; SameSite=Lax; Secure; max-age=86400;`;
-          document.cookie = `userId=${userId}; SameSite=Lax; Secure; max-age=86400;`;
-          self.$router.push("/home");
-          self.$router.go();
-        })
+           const login = await anth_service_login.login(self.nom, self.prenom, self.email, self.password);
+            console.log(response); 
+             self.$router.push('/Home'); 
+          })
         .catch(function (error) {
           if (error) {
             self.incorrect = true;
@@ -518,17 +494,6 @@ export default {
         });
     },
   },
-  mounted() {
-    if (document.cookie) {
-      const userIdCookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("userId="))
-        .split("=")[1];
-      console.log(userIdCookie);
-      if (userIdCookie) {
-        this.$router.push("/home");
-      }
-    }
-  },
+  
 };
 </script>

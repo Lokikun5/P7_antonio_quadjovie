@@ -492,12 +492,7 @@ export default {
       likedPost: [],
       posts: null,
       postsRecive: null,
-      token: document.cookie
-        ? document.cookie
-            .split("; ")
-            .find((row) => row.startsWith("user-token="))
-            .split("=")[1]
-        : null,
+      token: localStorage.getItem('token'),
       comments: null,
       newComment: null,
       userId: document.cookie
@@ -533,12 +528,7 @@ export default {
       }
       const self = this;
       axios
-        .put(`http://localhost:3000/api/user/modify/${self.userId}`, fd, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${this.token}`,
-          },
-        })
+        .put(`http://localhost:3000/api/user/modify/${self.userId}`, fd)
         .then(function (response) {
           console.log(response);
           self.$router.go();
