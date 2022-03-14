@@ -1,499 +1,119 @@
 <template>
-  <div class="signup">
-    <div class="wrapper fadeInDown">
-      <div id="formContent">
-        <!-- Tabs Titles -->
-        <h2 @click="switchToSignup" v-if="mode == 'signup'" class="active">
-          Sign Up
-        </h2>
-        <h2
-          @click="switchToSignup"
-          v-if="mode == 'login'"
-          class="inactive underlineHover"
-        >
-          Sign Up
-        </h2>
-        <h2 @click="switchToLogin" v-if="mode == 'login'" class="active">
-          Login
-        </h2>
-        <h2
-          @click="switchToLogin"
-          v-if="mode == 'signup'"
-          class="inactive underlineHover"
-        >
-          Login
-        </h2>
-        <!-- Login Form -->
-        <form v-on:submit.prevent="login">
-          <input
-            v-if="mode == 'signup'"
-            type="text"
-            id="nom"
-            name="nom"
-            placeholder="Nom"
-            required
-          />
-          <p v-if="errorNom && mode == 'signup'" class="red">
-            votre nom doit contenir au moins 3 caractères
-          </p>
-          <input
-            v-if="mode == 'signup'"
-            type="text"
-            id="prenom"
-            name="prenom"
-            placeholder="Prenom"
-            required
-          />
-          <p v-if="errorPrenom && mode == 'signup'" class="red">
-            votre prénom doit contenir au moins 3 caractères
-          </p>
-          <input
-            v-if="mode == 'signup'"
-            type="text"
-            id="email"
-            name="email"
-            placeholder="Email"
-            required
-          />
-          <p v-if="errorEmail && mode == 'signup'" class="red">
-            Email invalide
-          </p>
-          <p v-if="sameEmail && mode == 'signup'" class="red">
-            Cet Email est déja utilisé.
-          </p>
-          <input
-            v-if="mode == 'signup'"
-            type="password"
-            id="password"
-            name="login"
-            placeholder="Mot de passe"
-            required
-          />
-          <input
-            v-if="mode == 'login'"
-            type="text"
-            id="emailCheck"
-            name="email"
-            placeholder="email"
-            required
-          />
-          <input
-            v-if="mode == 'login'"
-            type="password"
-            id="passwordCheck"
-            name="login"
-            placeholder="password"
-            required
-          />
-          <p v-if="errorMdp && mode == 'signup'" class="red">
-            votre mot de passe doit contenir 8 caractères, une majuscule, une
-            minuscule et un caractère spécial
-          </p>
-          <input
-            v-if="mode == 'signup'"
-            @click="signup"
-            type="submit"
-            value="INSCRIPTION"
-          />
-          <input
-            v-if="mode == 'login'"
-            @click="login"
-            type="submit"
-            value="CONNEXION"
-          />
-        </form>
-        <div v-if="incorrect == true && mode == 'login'" class="error">
-          <p>Email ou mot de passe incorrect</p>
+    <div class="signUp logSign">
+        <div class="logSign__mainContainer signUp__mainContainer mainContainer">
+        
+
+            <div class="logSign__contentContainer contentContainer">
+                <label for="signUp__nameInput">Nom</label>
+                <input v-model="username" @change="nameCheck" id="signUp__nameInput" class="logSignInput" type="text">
+                <p :class="{successMsg : usernameChecked, failMsg: !usernameChecked}"></p>
+
+                <label for="signUp__mailInput">Adresse e-mail</label>
+                <input v-model="email" @change="emailCheck()" id="signUp__mailInput" class="logSignInput" type="text">
+                <p :class="{successMsg : emailChecked, failMsg: !emailChecked}"></p>
+
+                <label for="signUp__passwordInput">Mot de passe</label>
+                <input v-model="password" @change="pwCheck()" id="signUp__passwordInput" class="logSignInput" type="text">
+                <p :class="{successMsg : pwChecked, failMsg: !pwChecked}"></p>
+
+                <label for="signUp__confirmPasswordInput">Confirmation du mot de passe</label>
+                <input @change="confirmPwCheck()" id="signUp__confirmPasswordInput" class="logSignInput" type="text">
+                <p :class="{successMsg : confirmPwChecked, failMsg: !confirmPwChecked}"></p>
+
+                <button class="logSign__buttonMain" @click="sendSignUpData()">
+                Créer mon compte
+                </button>
+                
+            </div>
         </div>
-        <div id="formFooter">
-          <p>Bienvenue !</p>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
 
+<script>
+import axios from "axios"
+export default {
+    name: 'SignUp',
+    data: function() {
+        return {
+            username: "",
+            email: "",
+            password: "",
+            confirmPassword: "",
+            photo: "",
+
+            usernameChecked: "",
+            emailChecked: "",
+            pwChecked: "",
+            confirmPwChecked: "",
+        }
+    },
+    methods: {
+        nameCheck: function () {
+            let userNameInput = document.querySelector("#signUp__nameInput");
+            let textRegex = new RegExp("^((([A-za-zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ']+[ | -]{1}[A-za-zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ']+)+)|([A-Za-zàáâãäåçèéêëìíîïðòóôõöùúûüýÿ']+))$", "g", "i");
+            if(textRegex.test(this.username)) {
+                userNameInput.nextElementSibling.innerText= "Nom valide";
+                console.log(this.username);
+                this.usernameChecked = true;
+            } else {
+                userNameInput.nextElementSibling.innerText= "Nom invalide";
+                this.usernameChecked = false;
+            }
+        },
+        emailCheck: function () {
+            let emailInput = document.querySelector("#signUp__mailInput");
+            let emailRegex = new RegExp("^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$", "g");
+            if(emailRegex.test(this.email)) {
+                emailInput.nextElementSibling.innerText= "Adresse mail valide"
+                this.emailChecked = true
+            } else {
+                emailInput.nextElementSibling.innerText= "Adressse mail invalide"
+                this.emailChecked = false
+            }
+        },
+        pwCheck: function () {
+            let pwInput = document.querySelector("#signUp__passwordInput");
+            let textRegex = new RegExp("([A-za-z0-9àáâãäåçèéêëìíîïðòóôõöùúûüýÿ']+)", "g", "i");
+            if(textRegex.test(this.password)) {
+                pwInput.nextElementSibling.innerText= "Mot de passe valide"
+                this.pwChecked = true
+            } else {
+                pwInput.nextElementSibling.innerText= "Mot de passe invalide"
+                this.pwChecked = false
+            }
+        },
+        confirmPwCheck: function () {
+            let confirmPwInput = document.querySelector("#signUp__confirmPasswordInput");
+            if(confirmPwInput.value === document.querySelector("#signUp__passwordInput").value) {
+                confirmPwInput.nextElementSibling.innerText= "Mot de passe confirmé"
+                this.confirmPwChecked = true
+            } else {
+                confirmPwInput.nextElementSibling.innerText= "Mot de passe non confirmé"
+                this.confirmPwChecked = false
+            }
+        },
+        sendSignUpData: function() {
+            if(this.usernameChecked && this.emailChecked && this.pwChecked && this.confirmPwChecked) {
+                axios.post("http://localhost:3000/api/signup", {
+                    username: this.username,
+                    email: this.email,
+                    password: this.password,
+                    photo: this.photo
+                })
+                .then(() => {
+                    alert("Votre compte a bien été créé !")
+                    window.location.replace("/#/")
+                })
+                .catch(error => { console.log(error) });
+            } else {
+                alert("Veuillez vérifier les champs du formulaire ;)");
+            }
+        }
+    }
+}
+</script>
+
 <style lang="scss" scoped>
-.red {
-  color: red;
-  padding: 0px;
-  margin: 0px;
-}
-.error {
-  color: red;
-  margin-top: -30px;
-}
-.signup {
-  margin-top: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 550px;
-}
 
-a {
-  color: #92badd;
-  display: inline-block;
-  text-decoration: none;
-  font-weight: 400;
-}
-
-h2 {
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  text-transform: uppercase;
-  display: inline-block;
-  margin: 40px 8px 10px 8px;
-  color: #cccccc;
-}
-
-/* STRUCTURE */
-
-.wrapper {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  justify-content: center;
-  width: 100%;
-  min-height: 100%;
-  padding: 20px;
-}
-
-#formContent {
-  -webkit-border-radius: 10px 10px 10px 10px;
-  border-radius: 10px 10px 10px 10px;
-  background: #fff;
-  padding: 30px;
-  width: 100%;
-  max-width: 450px;
-  height: 500px;
-  position: relative;
-  padding: 0px;
-  text-align: center;
-}
-
-#formFooter {
-  background-color: #f6f6f6;
-  border-top: 1px solid #dce8f1;
-  padding: 25px;
-  text-align: center;
-  -webkit-border-radius: 0 0 10px 10px;
-  border-radius: 0 0 10px 10px;
-}
-
-/* TABS */
-
-h2.inactive {
-  color: #cccccc;
-}
-
-h2.active {
-  color: #0d0d0d;
-  border-bottom: 2px solid #5fbae9;
-}
-
-/* FORM TYPOGRAPHY*/
-
-input[type="button"],
-input[type="submit"],
-input[type="reset"] {
-  background-color: #56baed;
-  border: none;
-  color: white;
-  padding: 15px 80px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  text-transform: uppercase;
-  font-size: 13px;
-  -webkit-box-shadow: 0 10px 30px 0 rgba(95, 186, 233, 0.4);
-  box-shadow: 0 10px 30px 0 rgba(95, 186, 233, 0.4);
-  -webkit-border-radius: 5px 5px 5px 5px;
-  border-radius: 5px 5px 5px 5px;
-  margin: 5px 20px 40px 20px;
-  -webkit-transition: all 0.3s ease-in-out;
-  -moz-transition: all 0.3s ease-in-out;
-  -ms-transition: all 0.3s ease-in-out;
-  -o-transition: all 0.3s ease-in-out;
-  transition: all 0.3s ease-in-out;
-}
-
-input[type="button"]:hover,
-input[type="submit"]:hover,
-input[type="reset"]:hover {
-  background-color: #091f43;
-}
-
-input[type="button"]:active,
-input[type="submit"]:active,
-input[type="reset"]:active {
-  -moz-transform: scale(0.95);
-  -webkit-transform: scale(0.95);
-  -o-transform: scale(0.95);
-  -ms-transform: scale(0.95);
-  transform: scale(0.95);
-}
-
-input[type="password"],
-input[type="text"] {
-  background-color: #f6f6f6;
-  border: none;
-  color: #0d0d0d;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 5px;
-  width: 85%;
-  border: 2px solid #f6f6f6;
-  -webkit-transition: all 0.5s ease-in-out;
-  -moz-transition: all 0.5s ease-in-out;
-  -ms-transition: all 0.5s ease-in-out;
-  -o-transition: all 0.5s ease-in-out;
-  transition: all 0.5s ease-in-out;
-  -webkit-border-radius: 5px 5px 5px 5px;
-  border-radius: 5px 5px 5px 5px;
-}
-
-input[type="text"]:focus {
-  background-color: #fff;
-  border-bottom: 2px solid #5fbae9;
-}
-
-input[type="text"]:placeholder {
-  color: #cccccc;
-}
-
-.fadeInDown {
-  -webkit-animation-name: fadeInDown;
-  animation-name: fadeInDown;
-  -webkit-animation-duration: 1s;
-  animation-duration: 1s;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-}
-
-@-webkit-keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    -webkit-transform: translate3d(0, -100%, 0);
-    transform: translate3d(0, -100%, 0);
-  }
-  100% {
-    opacity: 1;
-    -webkit-transform: none;
-    transform: none;
-  }
-}
-
-@keyframes fadeInDown {
-  0% {
-    opacity: 0;
-    -webkit-transform: translate3d(0, -100%, 0);
-    transform: translate3d(0, -100%, 0);
-  }
-  100% {
-    opacity: 1;
-    -webkit-transform: none;
-    transform: none;
-  }
-}
-
-@keyframes incorrect {
-  0% {
-    transform: translateX(20px);
-  }
-  50% {
-    transform: translateX(-20px);
-  }
-  100% {
-    transform: translateX(0px);
-  }
-}
-
-/* Simple CSS3 Fade-in Animation */
-@-webkit-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@-moz-keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.incorrect {
-  animation: incorrect ease-in 1;
-}
-
-.fadeIn {
-  opacity: 0;
-  -webkit-animation: fadeIn ease-in 1;
-  -moz-animation: fadeIn ease-in 1;
-  animation: fadeIn ease-in 1;
-
-  -webkit-animation-fill-mode: forwards;
-  -moz-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-
-  -webkit-animation-duration: 1s;
-  -moz-animation-duration: 1s;
-  animation-duration: 1s;
-}
-
-.fadeIn.first {
-  -webkit-animation-delay: 0.4s;
-  -moz-animation-delay: 0.4s;
-  animation-delay: 0.4s;
-}
-
-/* Simple CSS3 Fade-in Animation */
-.underlineHover:after {
-  display: block;
-  left: 0;
-  bottom: -15px;
-  width: 0;
-  height: 5px;
-  background-color: #2912a8;
-  content: "";
-  transition: width 0.5s;
-}
-
-.underlineHover:hover {
-  color: #0d0d0d;
-  cursor: pointer;
-}
-
-.underlineHover:hover:after {
-  width: 100%;
-}
 
 </style>
-
-<script>
-import axios from "axios";
-import AuthService from "../services/auth_service";
-import AuthService_login from "../services/anth_service_login";
-//const CryptoJS = require("crypto-js");
-
-export default {
-  data() {
-    return {
-      sameEmail: false,
-      mode: "signup",
-      email: "",
-      errorEmail: false,
-      password: "",
-      errorMdp: false,
-      nom: "",
-      errorNom: false,
-      prenom: "",
-      errorPrenom: false,
-      incorrect: false,
-    };
-  },
-  methods: {
-    switchToSignup() {
-      this.mode = "signup";
-    },
-    switchToLogin() {
-      this.mode = "login";
-    },
-    validation() {
-      let validEmail = new RegExp(
-        /^(([^<>()\]\\.,;:\s@"]+(\.[^<>()\]\\.,;:\s@"]+)*)|(".+"))@(([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-      let validName = new RegExp(
-        /^[a-zA-Z]+[a-zA-Z]+[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*){3,}$/
-      );
-      let validPassword = new RegExp(
-        /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*.]).{8,}$/
-      );
-      validEmail.test(this.email)
-        ? (this.errorEmail = false)
-        : (this.errorEmail = true);
-      validName.test(this.nom)
-        ? (this.errorNom = false)
-        : (this.errorNom = true);
-      validName.test(this.prenom)
-        ? (this.errorPrenom = false)
-        : (this.errorPrenom = true);
-      validPassword.test(this.password)
-        ? (this.errorMdp = false)
-        : (this.errorMdp = true);
-      console.log(validPassword.test(this.password));
-      return (
-        validEmail.test(this.email) &&
-        validName.test(this.nom) &&
-        validName.test(this.prenom) &&
-        validPassword.test(this.password)
-      );
-    },
-    signup() {
-      const auth_service = new AuthService();
-      this.nom = document.querySelector("#nom").value;
-      this.prenom = document.querySelector("#prenom").value;
-      this.password = document.querySelector("#password").value;
-      this.email = document.querySelector("#email").value;
-      if (this.validation()) {
-        const self = this;
-        
-          axios.post("http://localhost:3000/api/user/signup", {
-            nom: this.nom,
-            prenom: this.prenom,
-            email: this.email,
-            password: this.password,
-          })
-          .then(function (response) {
-           const signup = await auth_service.signup(self.nom, self.prenom, self.email, self.password);
-            console.log(response); 
-            this.$router.push('/Home');  
-          })
-          .catch(function (error) {
-            console.log(error);
-            self.sameEmail = true;
-          });
-      }
-    },
-    login() {
-      const anth_service_login = new AuthService_login();
-      this.password = document.querySelector("#passwordCheck").value;
-      this.email = document.querySelector("#emailCheck").value;
-      const self = this;
-      axios
-        .post("http://localhost:3000/api/user/login", {
-          email: this.email,
-          password: this.password,
-        })
-        .then(function (response) {
-           const login = await anth_service_login.login(self.nom, self.prenom, self.email, self.password);
-            console.log(response); 
-             self.$router.push('/Home'); 
-          })
-        .catch(function (error) {
-          if (error) {
-            self.incorrect = true;
-          }
-        });
-    },
-  },
-  
-};
-</script>

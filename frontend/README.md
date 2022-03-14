@@ -1,4 +1,4 @@
-# frontend
+# groupomania-app
 
 ## Project setup
 ```

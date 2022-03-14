@@ -1,0 +1,99 @@
+
+$color-primary: #007ACC ;
+$color-secondary: #007ACC; 
+
+
+$font-primary: "Roboto Condensed";
+
+@mixin inter-only {
+    @media screen and (min-width: 549px) and (max-width: 1009px) {
+        @content;
+    }
+}
+
+@mixin desktop-only {
+    @media screen and (min-width: 1010px) {
+        @content;
+    }
+}
+
+@mixin full-width {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+@mixin gradient-main {
+    background: #F0F0F0; 
+     
+    background: linear-gradient(to bottom right, #F0F0F0, #007ACC); 
+}
+
+@mixin button-main {
+    font-family: $font-primary, Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 1em;
+    border: 0.1em black solid;
+    border-radius: 0.9em;
+    background-color: $color-secondary;
+    color: black;
+    box-shadow: 0.08vw 0.08vw 0.4vw white;
+    width: 10em;
+    height: 3em;
+    max-height: 2.4em;
+    max-width: 11em;
+    margin: 1em 0;
+    cursor: pointer;
+    & a {
+        text-decoration: none;
+        color: black;
+        height: 100%;
+        display: block;
+        padding: 0.45em;
+    }
+    &:hover {
+        transform: scale(1.05);
+        transition: all ease-in-out 400ms;
+    }
+    @include desktop-only {
+        box-shadow: 0.08vw 0.08vw 0.3vw white;
+    }
+    @include inter-only {
+        box-shadow: 0.08vw 0.08vw 0.5vw white;
+    }
+}
+
+@mixin button-secondary {
+    font-family: $font-primary, Helvetica, Arial, sans-serif;
+    font-weight: bold;
+    font-size: 0.9em;
+    border: 0.1em black solid;
+    border-radius: 0.7em;
+    background-color: $color-secondary;
+    color: black;
+    box-shadow: 0.08vw 0.08vw 0.4vw white;
+    width: 10em;
+    height: 2em;
+    max-height: 2.4em;
+    max-width: 11em;
+    margin: 0.8em auto;
+    cursor: pointer;
+    & a {
+        text-decoration: none;
+        color: black;
+        height: 100%;
+        display: block;
+        padding: 0.45em;
+    }
+    &:hover {
+        transform: scale(1.05);
+        transition: all ease-in-out 500ms;
+    }
+    @include desktop-only {
+        box-shadow: 0.08vw 0.08vw 0.3vw white;
+        // margin: 2vw 0 0 0;
+    }
+    @include inter-only {
+        box-shadow: 0.08vw 0.08vw 0.5vw white;
+    }
+}
